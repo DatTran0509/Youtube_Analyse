@@ -9,7 +9,6 @@ const __dirname = path.dirname(__filename);
 
 const router = express.Router();
 
-// Serve audio from database
 router.get('/audio/:id', async (req, res) => {
     try {
         const analysis = await Analysis.findById(req.params.id).select('audioData audioMimeType');
@@ -25,21 +24,17 @@ router.get('/audio/:id', async (req, res) => {
         res.send(analysis.audioData);
         
     } catch (error) {
-        console.error('Error serving audio:', error);
         res.status(500).json({ error: 'Server error' });
     }
 });
 
-// Fallback screenshot when Cloudinary fails
 router.get('/fallback-screenshot', (req, res) => {
     try {
-        // Create a simple placeholder image or serve default
         const defaultImagePath = path.join(__dirname, '../../public/default-screenshot.png');
         
         if (fs.existsSync(defaultImagePath)) {
             res.sendFile(defaultImagePath);
         } else {
-            // Generate simple SVG placeholder
             const svgPlaceholder = `
                 <svg width="640" height="360" xmlns="http://www.w3.org/2000/svg">
                     <rect width="640" height="360" fill="#f0f0f0"/>

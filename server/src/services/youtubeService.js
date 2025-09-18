@@ -17,9 +17,10 @@ export const processYouTubeUrl = async (url) => {
     let analysisId = null;
     
     try {
-        console.log('🎬 Starting video processing...');
-        
-        // 1. Create analysis record
+        if (!url.includes('youtube.com/watch') && !url.includes('youtu.be/')) {
+            throw new Error('Invalid YouTube URL');
+        }
+
         const analysis = new Analysis({
             youtubeUrl: url,
             status: 'processing'
@@ -27,23 +28,17 @@ export const processYouTubeUrl = async (url) => {
         
         const savedAnalysis = await analysis.save();
         analysisId = savedAnalysis._id;
-        console.log(`📝 Analysis created: ${analysisId}`);
 
-        // 2. Get video title
         let videoTitle = 'Unknown Video';
         try {
             const { stdout } = await execAsync(`yt-dlp --print title "${url}"`);
             videoTitle = stdout.trim();
         } catch (error) {
-            console.warn('⚠️ Could not fetch video title');
+            videoTitle = 'Video Title Unavailable';
         }
         
-        // 3. Take screenshot
-        console.log('📸 Taking screenshot...');
         const screenshotResult = await takeScreenshotAndUpload(url, analysisId);
         
-        // 4. Download and process audio
-        console.log('🎵 Processing audio...');
         const uploadsDir = path.join(__dirname, '../../uploads');
         if (!fs.existsSync(uploadsDir)) {
             fs.mkdirSync(uploadsDir, { recursive: true });
@@ -54,29 +49,18 @@ export const processYouTubeUrl = async (url) => {
         const wavPath = path.join(uploadsDir, `${timestamp}.wav`);
         
         try {
-            // Download audio
             await execAsync(`yt-dlp -f "bestaudio" -o "${audioPath}" "${url}"`);
             
-            // Find downloaded file
             const files = fs.readdirSync(uploadsDir).filter(file => file.startsWith(timestamp.toString()));
             const actualAudioPath = path.join(uploadsDir, files[0]);
             
-            // Convert to WAV
             await convertToWav(actualAudioPath, wavPath);
-            
-            // Read audio buffer
             const audioBuffer = fs.readFileSync(wavPath);
             
-            // 5. Generate transcript
-            console.log('📝 Generating transcript...');
             const transcriptionResponse = await sendAudioForTranscription(wavPath);
             const transcript = processTranscriptionResponse(transcriptionResponse);
-            
-            // 6. Analyze each segment for AI detection
-            console.log('🤖 Analyzing transcript segments...');
             const analyzedTranscript = await analyzeTranscript(transcript);
             
-            // 7. Save final result
             const updatedAnalysis = await Analysis.findByIdAndUpdate(analysisId, {
                 videoTitle,
                 screenshotUrl: screenshotResult.screenshotUrl,
@@ -89,17 +73,12 @@ export const processYouTubeUrl = async (url) => {
                 completedAt: new Date()
             }, { new: true });
             
-            // 8. Cleanup
             if (fs.existsSync(actualAudioPath)) fs.unlinkSync(actualAudioPath);
             if (fs.existsSync(wavPath)) fs.unlinkSync(wavPath);
             
-            console.log('🎉 Analysis completed successfully');
             return updatedAnalysis;
             
         } catch (audioError) {
-            console.error('❌ Audio processing failed:', audioError.message);
-            
-            // Save with screenshot only
             const updatedAnalysis = await Analysis.findByIdAndUpdate(analysisId, {
                 videoTitle,
                 screenshotUrl: screenshotResult.screenshotUrl,
@@ -113,7 +92,7 @@ export const processYouTubeUrl = async (url) => {
                     end: 0,
                     speaker: 'unknown',
                     ai_probability: null,
-                    analysis: 'processing_failed',
+                    analysis: 'MIXED',
                     confidence: 'unknown',
                     error: 'Audio processing failed'
                 }],
@@ -125,8 +104,6 @@ export const processYouTubeUrl = async (url) => {
         }
         
     } catch (error) {
-        console.error('❌ Processing failed:', error);
-        
         if (analysisId) {
             await Analysis.findByIdAndUpdate(analysisId, {
                 status: 'failed',

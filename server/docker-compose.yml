@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  youtube-analysis-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./public/screenshots:/app/public/screenshots
+    environment:
+      # Sử dụng MongoDB Atlas thay vì local MongoDB
+      - MONGODB_URI=${MONGODB_URI}
+      - ELEVEN_LABS_API_KEY=${ELEVEN_LABS_API_KEY}
+      - SAPLING_API_KEY=${SAPLING_API_KEY}
+      - PORT=8080
+      - NODE_ENV=production
+    restart: unless-stopped

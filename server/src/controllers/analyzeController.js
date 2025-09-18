@@ -9,9 +9,6 @@ class AnalyzeController {
         }
 
         try {
-            console.log('Starting analysis for:', url);
-            
-            // Process và chờ hoàn thành
             const result = await processYouTubeUrl(url);
 
             return res.status(200).json({ 
@@ -28,7 +25,6 @@ class AnalyzeController {
                 }
             });
         } catch (error) {
-            console.error('Error analyzing YouTube URL:', error);
             return res.status(500).json({ 
                 success: false,
                 error: 'Analysis failed: ' + error.message 

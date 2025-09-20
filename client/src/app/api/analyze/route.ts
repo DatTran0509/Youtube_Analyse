@@ -40,28 +40,8 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(response.data);
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Analysis error:', error);
     
-    if (error.response) {
-      console.error('Backend response error:', error.response.data);
-      console.error('Backend response status:', error.response.status);
-      
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: error.response.data?.error || 'Backend error'
-        },
-        { status: error.response.status }
-      );
-    }
-    
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: error.message || 'Analysis failed' 
-      },
-      { status: 500 }
-    );
   }
 }

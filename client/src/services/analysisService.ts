@@ -171,8 +171,8 @@ export const useAnalysisHistory = () => {
       const response = await fetchUserAnalyses(page, limit);
       setAnalyses(response.data.analyses);
       setPagination(response.data.pagination);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load analyses');
+    } catch (err) {
+      setError((err as Error).message || 'Failed to load analyses');
     } finally {
       setLoading(false);
     }
@@ -190,7 +190,7 @@ export const useAnalysisHistory = () => {
 export const useVideoAnalysis = () => {
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState<string>('');
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<AnalysisHistoryResponse | null>(null);
 
   const startAnalysis = async (url: string) => {
     setAnalyzing(true);
@@ -201,8 +201,8 @@ export const useVideoAnalysis = () => {
       const response = await analyzeVideo(url);
       setResult(response);
       return response;
-    } catch (err: any) {
-      setError(err.message || 'Analysis failed');
+    } catch (err: unknown) {
+      setError((err as Error).message || 'Analysis failed');
       throw err;
     } finally {
       setAnalyzing(false);
@@ -236,8 +236,8 @@ export const useAnalysisResult = (analysisId: string | null) => {
       } else {
         setError(response.error || 'Failed to load result');
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to load result');
+    } catch (err: unknown) {
+      setError((err as Error).message || 'Failed to load result');
     } finally {
       setLoading(false);
     }

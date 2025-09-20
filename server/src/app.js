@@ -38,14 +38,9 @@ app.use('/api/result', resultRoutes);
 app.use('/api/media', mediaRoutes);
 app.use('/api/user', userRoutes);
 // Health check endpoint
-app.get('/health', (req, res) => {
-    res.json({ 
-        status: 'OK', 
-        message: 'Server is running',
-        clerkConfigured: !!process.env.CLERK_SECRET_KEY
-    });
+app.use('/', (req, res) => {
+    res.status(200).json({ status: 'OK' });
 });
-
 // Global error handler
 app.use((error, req, res, next) => {
     console.error('Global error handler:', error);

@@ -47,24 +47,12 @@ export async function POST(request: NextRequest) {
     console.log(`User sync completed - action: ${response.data.data?.action || 'synced'}`);
     return NextResponse.json(response.data);
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('User sync error:', error);
     
-    if (error.response) {
-      return NextResponse.json(
-        { success: false, error: error.response.data?.error || 'Backend error' },
-        { status: error.response.status }
-      );
-    } else if (error.request) {
-      return NextResponse.json(
-        { success: false, error: 'Cannot connect to backend server' },
-        { status: 503 }
-      );
-    } else {
-      return NextResponse.json(
-        { success: false, error: `Sync failed: ${error.message}` },
-        { status: 500 }
-      );
-    }
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }

@@ -5,7 +5,7 @@ import { useUser } from '@clerk/nextjs';
 import { useEffect, useState, useRef } from 'react';
 
 // Global singleton để prevent duplicate sync
-let globalSyncState = {
+const globalSyncState = {
   isInitialized: false,
   syncing: false,
   synced: false,
@@ -71,8 +71,8 @@ export const useUserSync = () => {
           updateGlobalState({ syncError: data.error });
           console.error('Sync failed:', data.error);
         }
-      } catch (error: any) {
-        const errorMessage = error.message || 'Failed to sync user';
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         updateGlobalState({ syncError: errorMessage });
         console.error('Sync error:', error);
       } finally {

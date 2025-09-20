@@ -167,9 +167,9 @@ export default function AnalysisPage() {
       } else {
         setError('Analysis failed');
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Analysis error:', error);
-      setError(error.response?.data?.error || error.message || 'An error occurred');
+      
     } finally {
       setLoading(false);
       setLoadingStage('');
@@ -177,7 +177,7 @@ export default function AnalysisPage() {
   };
 
   const pollForCompletion = async (analysisId: string) => {
-    let attempts = 0; // Initialize attempts
+    const attempts = 0; // Initialize attempts
     const maxAttempts = 20; // Define maxAttempts
 
     const checkStatus = async () => {
@@ -246,8 +246,9 @@ export default function AnalysisPage() {
       } else {
         setError('Failed to fetch results');
       }
-    } catch (error: any) {
-      setError(error.response?.data?.error || 'Failed to fetch results');
+    } catch (error) {
+      console.error('Fetch results error:', error);
+      setError('Failed to fetch results');
     } finally {
       setLoadingResults(false);
       setLoadingStage('');

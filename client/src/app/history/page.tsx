@@ -146,8 +146,8 @@ export default function HistoryPage() {
       const response = await fetchUserAnalyses(page, 10);
       setAnalyses(response.data.analyses);
       setPagination(response.data.pagination);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load analyses');
+    } catch (err) {
+      setError((err as Error).message || 'Failed to load analyses');
     } finally {
       setLoading(false);
     }
@@ -165,8 +165,8 @@ export default function HistoryPage() {
       } else {
         setDetailError(response.error || 'Failed to load detail');
       }
-    } catch (err: any) {
-      setDetailError(err.message || 'Failed to load detail');
+    } catch (error) {
+      setDetailError((error as Error).message || 'Failed to load detail');
     } finally {
       setDetailLoading(false);
     }

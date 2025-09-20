@@ -82,9 +82,8 @@ export default function ResultPage() {
       } else {
         setError(response.error || 'Failed to fetch result');
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error fetching result:', err);
-      setError(err.message || 'Failed to fetch result');
     } finally {
       setLoading(false);
     }
@@ -284,7 +283,7 @@ export default function ResultPage() {
                         <audio 
                           controls 
                           className="w-full"
-                          src={`${process.env.NEXT_PUBLIC_BACKEND_URL || ''}${result.audioUrl}`}
+                          src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${result.audioUrl}`}
                           onError={(e) => {
                             console.error('Audio load error:', e);
                             console.error('Audio src:', `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080'}${result.audioUrl}`);

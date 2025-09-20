@@ -15,4 +15,7 @@ module.exports = {
     },
   },
   plugins: [],
+  future: {
+    disablePostcssPresetEnv: true,
+  },
 }

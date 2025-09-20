@@ -40,25 +40,14 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response.data);
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('User analyses API error:', error);
-    
-    if (error.response) {
-      console.error('Backend response error:', error.response.data);
-      console.error('Backend response status:', error.response.status);
-      
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: error.response.data?.error || 'Backend error'
-        },
-        { status: error.response.status }
-      );
-    }
     
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
     );
+      
+      
   }
 }

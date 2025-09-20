@@ -177,6 +177,8 @@ export default function AnalysisPage() {
   };
 
   const pollForCompletion = async (analysisId: string) => {
+    let attempts = 0; // Initialize attempts
+    const maxAttempts = 20; // Define maxAttempts
 
     const checkStatus = async () => {
       try {

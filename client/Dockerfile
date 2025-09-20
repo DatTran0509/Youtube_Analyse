@@ -1,0 +1,33 @@
+# Stage 1: Build the Next.js app
+FROM node:20-slim AS build
+
+WORKDIR /app
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application
+COPY . .
+
+# Build the Next.js app
+RUN npm run build
+
+# Stage 2: Run the Next.js app
+FROM node:20-slim
+
+WORKDIR /app
+
+# Copy only the necessary files from the build stage
+COPY --from=build /app /app
+
+# Install only production dependencies
+RUN npm install --omit=dev
+
+# Expose port 3000
+EXPOSE 3000
+
+# Start the Next.js server
+CMD ["npm", "start"]

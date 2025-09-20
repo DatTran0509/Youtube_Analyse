@@ -13,10 +13,9 @@ export const analyzeTranscript = async (transcript) => {
             text: "No transcript available",
             start: 0,
             end: 0,
-            speaker: 'unknown',
+            speaker: 'speaker',
             ai_probability: null,
-            analysis: 'MIXED',
-            confidence: 'unknown',
+            analysis: 'HUMAN',
             error: 'No transcript data'
         }];
     }
@@ -31,7 +30,6 @@ export const analyzeTranscript = async (transcript) => {
             id: i,
             ai_probability: analysis.score,
             analysis: analysis.verdict,
-            confidence: analysis.confidence,
             error: analysis.error
         });
         
@@ -46,18 +44,16 @@ export const analyzeTranscript = async (transcript) => {
 const analyzeSingleSegment = async (text) => {
     if (!text || text.trim().length < 10) {
         return {
-            score: 0.5,
-            verdict: 'MIXED',
-            confidence: 'low',
+            score: 0.3, // Default to lower score (more human-like)
+            verdict: 'HUMAN',
             error: null
         };
     }
 
     if (!SAPLING_API_KEY) {
         return {
-            score: Math.random() * 0.3 + 0.1,
+            score: Math.random() * 0.3 + 0.1, // Random between 0.1-0.4 (more human-like)
             verdict: 'HUMAN',
-            confidence: 'low',
             error: null
         };
     }
@@ -74,9 +70,8 @@ const analyzeSingleSegment = async (text) => {
 
         if (!response.data || typeof response.data.score !== 'number') {
             return {
-                score: 0.5,
-                verdict: 'MIXED',
-                confidence: 'low',
+                score: 0.3,
+                verdict: 'HUMAN',
                 error: null
             };
         }
@@ -85,28 +80,18 @@ const analyzeSingleSegment = async (text) => {
         return {
             score: Math.round(score * 1000) / 1000,
             verdict: getVerdict(score),
-            confidence: getConfidence(score),
             error: null
         };
 
     } catch (error) {
         return {
-            score: 0.5,
-            verdict: 'MIXED',
-            confidence: 'low',
+            score: 0.3,
+            verdict: 'HUMAN',
             error: null
         };
     }
 };
 
 const getVerdict = (score) => {
-    if (score > 0.6) return 'AI';
-    if (score < 0.4) return 'HUMAN';
-    return 'MIXED';
-};
-
-const getConfidence = (score) => {
-    if (score > 0.8 || score < 0.2) return 'high';
-    if (score > 0.6 || score < 0.4) return 'medium';
-    return 'low';
+    return score > 0.5 ? 'AI' : 'HUMAN';
 };

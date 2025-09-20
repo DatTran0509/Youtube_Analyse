@@ -452,7 +452,7 @@
             resetButton();
         }
         
-        // Display Transcript
+        // Update displayTranscript function
         function displayTranscript(transcript) {
             const transcriptContainer = document.getElementById('transcript');
             
@@ -460,18 +460,27 @@
                 const aiProb = segment.ai_probability || 0;
                 const probPercent = (aiProb * 100).toFixed(1);
                 
-                let probClass = 'low';
-                if (aiProb > 0.7) probClass = 'high';
-                else if (aiProb > 0.4) probClass = 'medium';
+                // ✅ Simplified color coding for AI vs HUMAN
+                let probClass = 'low'; // Human
+                let label = '👤 HUMAN';
+                let bgColor = '#e8f5e8'; // Light green for human
+                
+                if (segment.analysis === 'AI') {
+                    probClass = 'high';
+                    label = '🤖 AI';
+                    bgColor = '#ffe8e8'; // Light red for AI
+                }
                 
                 return `
-                    <div class="transcript-segment">
+                    <div class="transcript-segment" style="background-color: ${bgColor};">
                         <p><strong>⏱️ Time:</strong> ${segment.start?.toFixed(1)}s - ${segment.end?.toFixed(1)}s</p>
                         <p><strong>👤 Speaker:</strong> ${segment.speaker || 'Unknown'}</p>
                         <p><strong>💬 Text:</strong> "${segment.text}"</p>
-                        <span class="ai-probability ${probClass}">
-                            🤖 AI Probability: ${probPercent}%
-                        </span>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                            <span class="ai-probability ${probClass}">
+                                ${label} (${probPercent}% confidence)
+                            </span>
+                        </div>
                     </div>
                 `;
             }).join('');

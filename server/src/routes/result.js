@@ -1,15 +1,10 @@
 import express from 'express';
-import ResultController from '../controllers/resultController.js';
+import resultController from '../controllers/resultController.js';
+import { simpleAuth } from '../middleware/auth.js';
 
-const router = express.Router();
+const resultRoutes = express.Router();
 
-// Get specific analysis result
-router.get('/:id', ResultController.getResult);
+resultRoutes.get('/:id',simpleAuth, resultController.getResult);
+resultRoutes.get('/:id/summary',simpleAuth, resultController.getAnalysisSummary);
 
-// Get analysis summary (lighter response)
-router.get('/:id/summary', ResultController.getAnalysisSummary);
-
-// Get all analyses (paginated)
-router.get('/', ResultController.getAllAnalyses);
-
-export default router;
+export default resultRoutes;

@@ -65,14 +65,8 @@ const mergeShortSegments = (segments, minLength = 25) => {
         
         while (currentSegment.text.length < minLength && i + 1 < segments.length) {
             const nextSegment = segments[i + 1];
-            
             currentSegment.text = currentSegment.text + ' ' + nextSegment.text;
             currentSegment.end = nextSegment.end;
-            
-            if (currentSegment.speaker !== nextSegment.speaker) {
-                currentSegment.speaker = 'mixed';
-            }
-            
             i++;
         }
         
@@ -92,7 +86,7 @@ export const processTranscriptionResponse = (response) => {
             text: segment.text.trim(),
             start: segment.start || 0,
             end: segment.end || 0,
-            speaker: segment.speaker || 'unknown'
+            speaker: 'speaker'
         }));
     } else if (response.text) {
         const sentences = response.text.split(/[.!?]+/).filter(s => s.trim().length > 0);
@@ -101,7 +95,7 @@ export const processTranscriptionResponse = (response) => {
             text: sentence.trim() + '.',
             start: index * 4,
             end: (index + 1) * 4,
-            speaker: 'unknown'
+            speaker: 'speaker'
         }));
     } else {
         segments = [{
@@ -109,7 +103,7 @@ export const processTranscriptionResponse = (response) => {
             text: "Transcription completed",
             start: 0,
             end: 5,
-            speaker: 'unknown'
+            speaker: 'speaker'
         }];
     }
     
@@ -127,13 +121,13 @@ const mockResponse = () => ({
             text: "When you hear the term artificial intelligence, what comes to mind.",
             start: 0,
             end: 4,
-            speaker: "speaker_0"
+            speaker: "speaker"
         },
         {
             text: "Super-powered robots.",
             start: 4,
             end: 8,
-            speaker: "speaker_0"
+            speaker: "speaker"
         }
     ]
 });

@@ -1,15 +1,14 @@
+// server/src/controllers/resultController.js
 import Analysis from '../models/Analysis.js';
 
 const generateAISummary = (transcript) => {
     if (!transcript || !Array.isArray(transcript) || transcript.length === 0) {
         return {
             verdict: 'NO_DATA',
-            confidence: 'unknown',
             aiProbability: null,
             totalSegments: 0,
             aiSegments: 0,
             humanSegments: 0,
-            mixedSegments: 0,
             error: 'No transcript data available'
         };
     }
@@ -21,57 +20,52 @@ const generateAISummary = (transcript) => {
     if (validSegments.length === 0) {
         return {
             verdict: 'NO_ANALYSIS',
-            confidence: 'unknown',
             aiProbability: null,
             totalSegments: transcript.length,
             aiSegments: 0,
             humanSegments: 0,
-            mixedSegments: 0,
             error: 'No valid AI analysis found'
         };
     }
 
     const aiSegments = validSegments.filter(s => s.analysis === 'AI').length;
     const humanSegments = validSegments.filter(s => s.analysis === 'HUMAN').length;
-    const mixedSegments = validSegments.filter(s => s.analysis === 'MIXED').length;
     
     const avgAiProbability = validSegments.reduce((sum, s) => sum + s.ai_probability, 0) / validSegments.length;
-
-    let verdict, confidence;
-    if (aiSegments > humanSegments && aiSegments > mixedSegments) {
-        verdict = 'AI';
-        confidence = aiSegments > validSegments.length * 0.6 ? 'high' : 'medium';
-    } else if (humanSegments > aiSegments && humanSegments > mixedSegments) {
-        verdict = 'HUMAN';
-        confidence = humanSegments > validSegments.length * 0.6 ? 'high' : 'medium';
-    } else {
-        verdict = 'MIXED';
-        confidence = 'medium';
-    }
+    const verdict = aiSegments > humanSegments ? 'AI' : 'HUMAN';
 
     return {
         verdict,
-        confidence,
         aiProbability: Math.round(avgAiProbability * 100) / 100,
         totalSegments: validSegments.length,
         aiSegments,
         humanSegments,
-        mixedSegments,
         error: null
     };
 };
 
 class ResultController {
     async getResult(req, res) {
-        const { id } = req.params;
-
         try {
-            const analysis = await Analysis.findById(id);
-            
+            const { id } = req.params;
+            const userId = req.headers['x-user-id'];
+
+            if (!userId) {
+                return res.status(401).json({
+                    success: false,
+                    error: 'User not authenticated'
+                });
+            }
+
+            const analysis = await Analysis.findOne({ 
+                _id: id, 
+                userId: userId
+            });
+
             if (!analysis) {
-                return res.status(404).json({ 
-                    success: false, 
-                    error: 'Analysis not found' 
+                return res.status(404).json({
+                    success: false,
+                    error: 'Analysis not found or access denied'
                 });
             }
             
@@ -129,17 +123,10 @@ class ResultController {
                     createdAt: analysis.createdAt,
                     completedAt: analysis.completedAt,
                     screenshotUrl: analysis.screenshotUrl || `/api/media/fallback-screenshot`,
-                    hasAudio: !!analysis.audioSize,
+                    hasAudio: !!(analysis.audioData && analysis.audioData.length > 0),
                     audioSize: analysis.audioSize || 0,
                     transcriptSegments: (analysis.transcript || []).length,
                     aiAnalysisSummary: aiSummary,
-                    quickSummary: {
-                        verdict: aiSummary.verdict,
-                        confidence: aiSummary.confidence,
-                        aiPercentage: aiSummary.aiPercentage,
-                        humanPercentage: aiSummary.humanPercentage,
-                        hasErrors: !!aiSummary.error
-                    }
                 }
             };
 
@@ -181,13 +168,6 @@ class ResultController {
                         completedAt: analysis.completedAt,
                         screenshotUrl: analysis.screenshotUrl || `/api/media/fallback-screenshot`,
                         hasAudio: !!analysis.audioSize,
-                        quickSummary: {
-                            verdict: aiSummary.verdict,
-                            confidence: aiSummary.confidence,
-                            aiPercentage: aiSummary.aiPercentage,
-                            totalSegments: aiSummary.totalSegments,
-                            hasErrors: !!aiSummary.error
-                        }
                     };
                 })
             );
@@ -195,13 +175,7 @@ class ResultController {
             const response = {
                 success: true,
                 data: {
-                    analyses: analysesWithSummary,
-                    pagination: {
-                        page,
-                        limit,
-                        total,
-                        pages: Math.ceil(total / limit)
-                    }
+                    analyses: analysesWithSummary
                 }
             };
 

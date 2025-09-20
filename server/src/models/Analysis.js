@@ -1,6 +1,21 @@
 import mongoose from 'mongoose';
 
 const analysisSchema = new mongoose.Schema({
+    // Thêm thông tin user
+    userId: {
+        type: String,
+        required: true,
+        index: true // Tạo index để query nhanh
+    },
+    userEmail: {
+        type: String,
+        required: false
+    },
+    userName: {
+        type: String,
+        required: false
+    },
+    
     youtubeUrl: {
         type: String,
         required: true,
@@ -51,6 +66,9 @@ const analysisSchema = new mongoose.Schema({
         type: Date
     }
 });
+
+// Tạo compound index cho user và thời gian
+analysisSchema.index({ userId: 1, createdAt: -1 });
 
 const Analysis = mongoose.model('Analysis', analysisSchema);
 

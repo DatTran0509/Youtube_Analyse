@@ -1,10 +1,12 @@
 import express from 'express';
-import analyzeController from '../controllers/analyzeController.js';
-import { validateYouTubeUrl, handleValidationErrors } from '../middleware/validation.js';
-
+import analysisController from '../controllers/analysisController.js';
+import { simpleAuth } from '../middleware/auth.js';
 const router = express.Router();
 
-// POST /analyze route for submitting YouTube URLs
-router.post('/analyze', validateYouTubeUrl, handleValidationErrors, analyzeController.analyzeVideo);
+// Simple auth check - chỉ cần userId từ frontend
+
+
+router.post('/analyze', simpleAuth, analysisController.createAnalysis);
+router.get('/user/analyses', simpleAuth, analysisController.getUserAnalyses);
 
 export default router;

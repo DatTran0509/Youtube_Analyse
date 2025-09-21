@@ -7,7 +7,11 @@ dotenv.config();
 const ELEVEN_LABS_API_KEY = process.env.ELEVEN_LABS_API_KEY;
 
 export const sendAudioForTranscription = async (audioFilePath) => {
-    if (!ELEVEN_LABS_API_KEY || !fs.existsSync(audioFilePath)) {
+    if (!ELEVEN_LABS_API_KEY) {
+        return mockResponse();
+    }
+
+    if (!fs.existsSync(audioFilePath)) {
         return mockResponse();
     }
 
@@ -30,7 +34,7 @@ export const sendAudioForTranscription = async (audioFilePath) => {
         if (error.response?.status === 422 || error.response?.status === 400) {
             return tryExperimentalModel(audioFilePath);
         }
-        
+
         return mockResponse();
     }
 };
@@ -108,26 +112,28 @@ export const processTranscriptionResponse = (response) => {
     }
     
     const mergedSegments = mergeShortSegments(segments);
-    
+
     return mergedSegments.map((segment, index) => ({
         ...segment,
         id: index
     }));
 };
 
-const mockResponse = () => ({
-    segments: [
-        {
-            text: "When you hear the term artificial intelligence, what comes to mind.",
-            start: 0,
-            end: 4,
-            speaker: "speaker"
-        },
-        {
-            text: "Super-powered robots.",
-            start: 4,
-            end: 8,
-            speaker: "speaker"
-        }
-    ]
-});
+const mockResponse = () => {
+    return {
+        segments: [
+            {
+                text: "When you hear the term artificial intelligence, what comes to mind.",
+                start: 0,
+                end: 4,
+                speaker: "speaker"
+            },
+            {
+                text: "Super-powered robots.",
+                start: 4,
+                end: 8,
+                speaker: "speaker"
+            }
+        ]
+    };
+};

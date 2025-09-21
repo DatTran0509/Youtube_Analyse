@@ -30,10 +30,8 @@ export const uploadScreenshotToCloudinary = async (buffer, analysisId, format = 
                 uploadOptions,
                 (error, result) => {
                     if (error) {
-                        resolve({
-                            url: `/api/media/fallback-screenshot`,
-                            publicId: null
-                        });
+                        console.error('Cloudinary upload error:', error);
+                        throw Error('Cloudinary upload failed');
                     } else {
                         resolve({
                             url: result.secure_url,
@@ -45,10 +43,8 @@ export const uploadScreenshotToCloudinary = async (buffer, analysisId, format = 
         });
         
     } catch (error) {
-        return {
-            url: `/api/media/fallback-screenshot`,
-            publicId: null
-        };
+        console.error('Error uploading to Cloudinary:', error);
+        throw error;
     }
 };
 

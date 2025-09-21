@@ -91,34 +91,8 @@ export const processYouTubeUrl = async (url, analysisId = null, userId = null) =
             return updatedAnalysis;
 
         } catch (audioError) {
-            // Cập nhật khi audio processing failed
-            const updateData = {
-                videoTitle,
-                screenshotUrl: screenshotResult.screenshotUrl,
-                screenshotCloudinaryId: screenshotResult.screenshotCloudinaryId,
-                audioData: null,
-                audioSize: 0,
-                transcript: [{
-                    id: 0,
-                    text: "Audio processing failed",
-                    start: 0,
-                    end: 0,
-                    ai_probability: null,
-                    analysis: 'HUMAN',
-                    error: 'Audio processing failed'
-                }],
-                status: 'completed',
-                completedAt: new Date()
-            };
-
-            // Chỉ thêm userId nếu có
-            if (userId) {
-                updateData.userId = userId;
-            }
-
-            const updatedAnalysis = await Analysis.findByIdAndUpdate(currentAnalysisId, updateData, { new: true });
-
-            return updatedAnalysis;
+            console.error('Audio processing error:', audioError);
+            throw new Error('Failed to process audio from YouTube video');
         }
 
     } catch (error) {

@@ -68,7 +68,7 @@ class ResultController {
                     error: 'Analysis not found or access denied'
                 });
             }
-            
+            const backendUrl = process.env.BACKEND_URL 
             const response = {
                 success: true,
                 data: {
@@ -79,7 +79,7 @@ class ResultController {
                     transcript: analysis.transcript || [],
                     createdAt: analysis.createdAt,
                     completedAt: analysis.completedAt,
-                    screenshotUrl: analysis.screenshotUrl || `/api/media/fallback-screenshot`,
+                    screenshotUrl: analysis.screenshotUrl ,
                     audioUrl: analysis.audioData ? `/api/media/audio/${analysis._id}` : null,
                     audioSize: analysis.audioSize || 0,
                     audioMimeType: analysis.audioMimeType || 'audio/wav',
@@ -122,7 +122,7 @@ class ResultController {
                     status: analysis.status,
                     createdAt: analysis.createdAt,
                     completedAt: analysis.completedAt,
-                    screenshotUrl: analysis.screenshotUrl || `/api/media/fallback-screenshot`,
+                    screenshotUrl: analysis.screenshotUrl,
                     hasAudio: !!(analysis.audioData && analysis.audioData.length > 0),
                     audioSize: analysis.audioSize || 0,
                     transcriptSegments: (analysis.transcript || []).length,
@@ -166,7 +166,7 @@ class ResultController {
                         status: analysis.status,
                         createdAt: analysis.createdAt,
                         completedAt: analysis.completedAt,
-                        screenshotUrl: analysis.screenshotUrl || `/api/media/fallback-screenshot`,
+                        screenshotUrl: analysis.screenshotUrl ,
                         hasAudio: !!analysis.audioSize,
                     };
                 })

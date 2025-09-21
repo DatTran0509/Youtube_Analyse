@@ -7,10 +7,9 @@ import axios from 'axios';
 import { Loader2, CheckCircle, AlertCircle, Play, Clock, LogIn, Brain, TrendingUp, BarChart3, Sparkles, Eye, ArrowUp } from 'lucide-react';
 import type { AnalysisResponse, ResultResponse, AnalysisData, TranscriptSegment } from '@/type/analysis';
 import { useUserSync } from '@/services/useUserSync';
-
 export default function AnalysisPage() {
   const { user, isSignedIn, isLoaded } = useUser();
-  const { getToken } = useAuth();
+  const { getToken, userId } = useAuth();
   const { synced, syncing, syncError } = useUserSync();
   const [url, setUrl] = useState('');
   const [analysisResult, setAnalysisResult] = useState<AnalysisResponse['data'] | null>(null);
@@ -21,6 +20,7 @@ export default function AnalysisPage() {
   const [error, setError] = useState('');
   const [isPageLoaded, setIsPageLoaded] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  
 
   useEffect(() => {
     setIsPageLoaded(true);
@@ -146,10 +146,14 @@ export default function AnalysisPage() {
 
     try {
       console.log('Sending request to Next.js API...');
-
+      const headers = {
+        'Content-Type': 'application/json',
+        'x-user-id': userId
+      };
       const response = await axios.post<AnalysisResponse>('/api/analyze', {
         url: url
       }, {
+        headers,
         timeout: 120000
       });
 
@@ -188,7 +192,8 @@ export default function AnalysisPage() {
         const token = await getToken();
         const response = await axios.get(`/api/result/${analysisId}`, {
           headers: {
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token}`,
+            'x-user-id': userId
           }
         });
 
@@ -231,7 +236,8 @@ export default function AnalysisPage() {
       const token = await getToken();
       const response = await axios.get<ResultResponse>(`/api/result/${analysisId}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'x-user-id': userId
         }
       });
 

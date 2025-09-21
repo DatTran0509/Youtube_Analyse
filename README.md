@@ -43,8 +43,8 @@ It is built with **Next.js (frontend)** and **Node.js + Express.js (backend)**, 
 ![Analyze](Images/Result_2.png)  
 ![History](Images/History.png)  
 
-![JSON_RESULT_1](Images/Result_1.png)  
-![JSON_RESULT_2](Images/Result_2.png)  
+![JSON_RESULT_1](Images/JSON_Result_1.png)  
+![JSON_RESULT_2](Images/JSON_Result_2.png)  
 
 
 
@@ -80,7 +80,7 @@ cd Youtube_Analysis
 For both server and client:  
 ```bash
 cd server && npm install
-cd ../client && npm install
+cd client && npm install
 ```  
 
 ---
@@ -104,12 +104,23 @@ SCREENSHOT_API_KEY=YOUR_API_KEY
 PORT=8080
 ```  
 
-### Client `.env`  
-```bash
+## Client `.env`  
+bash
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=YOUR_API_KEY
 CLERK_SECRET_KEY=YOUR_API_KEY
-NEXT_PUBLIC_BACKEND_URL=http://server:8080 
+NEXT_PUBLIC_BACKEND_URL=http://server:8080
+``` 
+```
+💡 **Note**:  
+- If you want to run locally (without Docker), update your Client `.env` file:  
+```bash
+NEXT_PUBLIC_BACKEND_URL=http://0.0.0.0:8080
 ```  
+- Then run the applications manually:  
+```bash
+cd server && npm run dev
+cd ../client && npm run dev
+``` 
 
 ---
 

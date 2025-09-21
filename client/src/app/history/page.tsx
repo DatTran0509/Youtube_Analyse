@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useUser, SignInButton } from '@clerk/nextjs';
+import { useAuth } from '@clerk/nextjs';
 import Navbar from '@/components/Navbar';
 import { 
   Loader2, 
@@ -21,7 +22,7 @@ import {
   LogIn
 } from 'lucide-react';
 import { useUserSync } from '@/services/useUserSync';
-
+import axios from 'axios';
 interface AnalysisHistoryItem {
   _id: string;
   youtubeUrl: string;
@@ -74,6 +75,7 @@ interface AnalysisDetailData {
 export default function HistoryPage() {
   const { user, isSignedIn, isLoaded } = useUser();
   const { synced, syncing, syncError } = useUserSync();
+  const { userId } = useAuth();
   
   const [analyses, setAnalyses] = useState<AnalysisHistoryItem[]>([]);
   const [pagination, setPagination] = useState<PaginationInfo>({
@@ -94,20 +96,15 @@ export default function HistoryPage() {
   // Fetch functions
   const fetchUserAnalyses = async (page: number = 1, limit: number = 10) => {
     try {
-      const response = await fetch(`/api/user/analyses?page=${page}&limit=${limit}`, {
-        method: 'GET',
+      const response = await axios.get(`/api/user/analyses`, {
+        params: { page, limit },
         headers: {
           'Content-Type': 'application/json',
+          'x-user-id': userId,
         },
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch analyses');
-      }
-
-      const data = await response.json();
-      return data;
+  
+      return response.data;
     } catch (error) {
       console.error('Error fetching user analyses:', error);
       throw error;
@@ -116,20 +113,14 @@ export default function HistoryPage() {
 
   const fetchAnalysisResult = async (analysisId: string) => {
     try {
-      const response = await fetch(`/api/result/${analysisId}`, {
-        method: 'GET',
+      const response = await axios.get(`/api/result/${analysisId}`, {
         headers: {
           'Content-Type': 'application/json',
-        },
+          'x-user-id': userId,
+        },  
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch result');
-      }
-
-      const data = await response.json();
-      return data;
+  
+      return response.data;
     } catch (error) {
       console.error('Error fetching analysis result:', error);
       throw error;

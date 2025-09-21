@@ -1,54 +1,23 @@
-# YouTube Analysis Service
 
-This project is a Node.js service that analyzes YouTube videos by extracting audio, taking screenshots, and providing transcriptions with AI analysis. It utilizes various technologies including Puppeteer, ytdl-core, FFmpeg, ElevenLabs Scribe, and GPTZero.
-
-## Table of Contents
-
-- [Features](#features)
-- [Setup](#setup)
-- [Environment Variables](#environment-variables)
-- [Design Decisions](#design-decisions)
-- [Docker](#docker)
-- [Sample Output](#sample-output)
-- [End-to-End Capture](#end-to-end-capture)
-
-## Features
-
-- Submit a YouTube URL via a web form or REST API.
-- Automatically take a thumbnail screenshot of the video.
-- Download the audio track and convert it to WAV format.
-- Transcribe audio with word-level timestamps and speaker diarization.
-- Analyze sentences for AI probability using GPTZero.
-- Retrieve analysis results via a REST API.
-
-## Setup
-
-1. Clone the repository:
-   ```
-   git clone <repository-url>
-   cd youtube-analysis-service
-   ```
-
-2. Install dependencies:
-   ```
-   npm install
-   ```
-
-3. Set up MongoDB and ensure it is running.
-
-4. Create a `.env` file based on the `.env.example` file and fill in the required environment variables.
-
-5. Start the application:
-   ```
-   npm start
-   ```
-
+# Setup
 ## Environment Variables
 
-- `MONGODB_URI`: Connection string for MongoDB.
-- `ELEVENLABS_API_KEY`: API key for ElevenLabs Scribe.
-- `GPTZERO_API_KEY`: API key for GPTZero.
-- `PORT`: Port number for the application (default is 8080).
+### Server `.env`  
+```bash
+MONGODB_URI=mongodb+srv://...
+ELEVEN_LABS_API_KEY=YOUR_API_KEY
+ELEVEN_LABS_API_URL=https://api.elevenlabs.io/v1/audio-to-text
+SAPLING_API_KEY=YOUR_API_KEY
+SAPLING_API_URL=https://api.sapling.ai/api/v1/aidetect
+CLOUDINARY_CLOUD_NAME=YOUR_API_KEY
+CLOUDINARY_API_KEY=YOUR_API_KEY
+CLOUDINARY_API_SECRET=YOUR_API_KEY
+CLIENT_URL=http://localhost:3000
+CLERK_PUBLISHABLE_KEY=YOUR_API_KEY
+CLERK_SECRET_KEY=YOUR_API_KEY
+SCREENSHOT_API_KEY=YOUR_API_KEY
+PORT=8080
+```  
 
 ## Design Decisions
 
@@ -68,17 +37,69 @@ docker-compose up --build
 The service generates a JSON output containing the analysis results, including the transcript and AI probability. A sample output structure is as follows:
 ```json
 {
-  "id": "unique-analysis-id",
-  "screenshot": "path/to/screenshot.png",
-  "transcript": [
-    {
-      "sentence": "This is a sample sentence.",
-      "ai_probability": 0.85
+    "success": true,
+    "data": {
+        "id": "68d0177ca92e1991fe10a27e",
+        "youtubeUrl": "https://www.youtube.com/watch?v=1aA1WGON49E",
+        "videoTitle": "A one minute TEDx Talk for the digital age | Woody Roseland | TEDxMileHigh",
+        "status": "completed",
+        "transcript": [
+            {
+                "id": 0,
+                "text": "Wow. What an audience. But if I'm being honest, I don't care what you think of my talk.",
+                "start": 0,
+                "end": 12,
+                "speaker": "speaker",
+                "ai_probability": 0.002,
+                "analysis": "HUMAN",
+                "error": null
+            },
+            {
+                "id": 1,
+                "text": "I don't. I care what the internet thinks of my talk.",
+                "start": 12,
+                "end": 20,
+                "speaker": "speaker",
+                "ai_probability": 0.988,
+                "analysis": "AI",
+                "error": null
+            },
+            {
+                "id": 2,
+                "text": "(laughs) 'Cause they're the ones who get it seen and get it shared.",
+                "start": 20,
+                "end": 24,
+                "speaker": "speaker",
+                "ai_probability": 0.985,
+                "analysis": "AI",
+                "error": null
+            },
+            {
+                "id": 3,
+                "text": "And I think that's where most people get it wrong.",
+                "start": 24,
+                "end": 28,
+                "speaker": "speaker",
+                "ai_probability": 0.795,
+                "analysis": "AI",
+                "error": null
+            },
+        ],
+        "createdAt": "2025-09-21T15:19:24.359Z",
+        "completedAt": "2025-09-21T15:19:56.040Z",
+        "screenshotUrl": "https://res.cloudinary.com/dwcy4cz5j/image/upload/v1758467972/youtube-analysis/screenshots/screenshot_68d0177ca92e1991fe10a27e.png",
+        "audioUrl": "/api/media/audio/68d0177ca92e1991fe10a27e",
+        "audioSize": 2584366,
+        "audioMimeType": "audio/wav",
+        "screenshotCloudinaryId": "youtube-analysis/screenshots/screenshot_68d0177ca92e1991fe10a27e",
+        "aiAnalysisSummary": {
+            "verdict": "HUMAN",
+            "aiProbability": 0.44,
+            "totalSegments": 17,
+            "aiSegments": 8,
+            "humanSegments": 9,
+            "error": null
+        }
     }
-  ]
 }
 ```
-
-## End-to-End Capture
-
-A short video demonstrating the end-to-end functionality of the service can be found [here](link-to-video).

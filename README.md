@@ -1,18 +1,15 @@
-# 🎥 YouTube Analysis Project  
+# YouTube Analysis Project  
 
 A **full-stack web application** for analyzing YouTube videos.  
 Users can submit YouTube URLs, generate transcripts, run AI-powered analysis, and track their analysis history.  
 
 ---
 
-## 📌 Table of Contents  
-- [Introduction](#introduction)  
-- [Features](#features)  
-- [Screenshots](#screenshots)  
-- [Project Structure](#project-structure)  
-- [Setup](#setup)  
-- [Environment Variables](#environment-variables)  
-- [Running with Docker](#running-with-docker)  
+## 🎬 Demo Video  
+
+Watch the demo video of the application in action:  
+[![Demo Video]](https://drive.google.com/file/d/1BjVLGO7_Z2Nmns2MoGNKd76OhHp_fYIL/view?usp=drive_link)  
+ 
 
 ---
 
@@ -29,20 +26,20 @@ It is built with **Next.js (frontend)** and **Node.js + Express.js (backend)**, 
 - **Analyze Page**: Submit a YouTube URL and view results.  
 - **History Page**: View analysis history of previously submitted videos.  
 - **Backend Processing**: Extracts audio, transcribes content, and runs AI-based insights.  
-- **Responsive Design**: Optimized for both desktop and mobile.  
 - **Dockerized Deployment**: Easy setup using Docker Compose.  
 
 ---
 
 ## 🖼️ UX/UI  
 
-
+- **Home Page**
 ![Home](Images/Home_1.png)  
-
+- **Analyse Page**
 ![Analyze](Images/Result_1.png)  
 ![Analyze](Images/Result_2.png)  
+- **History Page**
 ![History](Images/History.png)  
-
+- **Postman Test API**
 ![JSON_RESULT_1](Images/JSON_Result_1.png)  
 ![JSON_RESULT_2](Images/JSON_Result_2.png)  
 
@@ -105,11 +102,10 @@ PORT=8080
 ```  
 
 ## Client `.env`  
-bash
+```bash
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=YOUR_API_KEY
 CLERK_SECRET_KEY=YOUR_API_KEY
 NEXT_PUBLIC_BACKEND_URL=http://server:8080
-``` 
 ```
 💡 **Note**:  
 - If you want to run locally (without Docker), update your Client `.env` file:  
